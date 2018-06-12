@@ -1,4 +1,4 @@
-const Logger = require('../logger');
+const debug = require('debug')('styx:find-modules');
 const { traverse } = require('../common');
 
 function processParameters(element) {
@@ -69,13 +69,13 @@ function processParameters(element) {
 }
 
 module.exports = async function(modules, opts) {
-  Logger.log(`Bundle contains ${opts.moduleList.value.elements.length} modules.`);
+  debug(`Bundle contains ${opts.moduleList.value.elements.length} modules.`);
 
   opts.moduleList.value.elements.forEach((element, index) => {
     switch (true) {
 
     case element && element.type.indexOf('Function') === 0:
-      Logger.log(`Module ${index} is a Function`);
+      debug(`Module ${index} is a Function`);
       modules.push({
         id: index,
         parameters: processParameters(element),
@@ -87,7 +87,7 @@ module.exports = async function(modules, opts) {
       break;
 
     case element === null || (element.type === 'Literal' && element.value === null):
-      Logger.log(`Module ${index} is null`);
+      debug(`Module ${index} is null`);
       modules.push({
         id: index,
         parameters: null,
@@ -99,7 +99,7 @@ module.exports = async function(modules, opts) {
       break;
 
     default:
-      Logger.log(`Unknown module ast node type for module ${index}: ${element.type}`);
+      debug(`Unknown module ast node type for module ${index}: ${element.type}`);
       break;
     }
   });

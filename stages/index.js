@@ -4,7 +4,7 @@ const path = require('path');
 const camelCase = require('camelcase');
 const acorn = require('acorn');
 
-const Logger = require('./logger');
+const escope = require('escope');
 
 const pwd = __dirname;
 
@@ -15,6 +15,9 @@ const opts = {};
 const bundle = fs.readFileSync(path.join(pwd, '..', 'build-bundle', 'bundle.js'));
 
 opts.ast = acorn.parse(bundle);
+
+opts.scopeManager = escope.analyze(opts.ast);
+opts.scopeManager.acquire(opts.ast); // global scope
 
 
 module.exports = {
@@ -31,8 +34,11 @@ const dirs = fs.readdirSync(pwd)
   .forEach(i => {
     const fn = require(path.join(pwd, i));
     module.exports[camelCase(i)] = (...args) => {
-      Logger.start(`Step ${i}`);
       const ret = fn.apply(module.exports, [modules, opts, args]);
       return ret;
+    }
+
+    for (let property in fn) {
+      module.exports[camelCase(i)][property] = fn[property];
     }
   });

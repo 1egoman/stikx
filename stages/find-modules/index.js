@@ -1,4 +1,5 @@
-const Logger = require('../logger');
+const debug = require('debug')('styx:find-modules');
+
 const { traverse } = require('../common');
 
 module.exports = async function(modules, opts) {
@@ -12,9 +13,9 @@ module.exports = async function(modules, opts) {
 
   const values = traverse(opts.ast, isArrayWithFunctionsInside);
   if (values.length === 0) {
-    Logger.fail(`No potential module arrays found!`);
+    throw new Error(`No potential module arrays found!`);
   } else {
-    Logger.success(`found ${values.length} potential, picking longest`);
+    debug(`found ${values.length} potential, picking longest`);
   }
 
   const valueLengths = values.map(({path, value}) => value.elements.length);
