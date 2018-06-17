@@ -26,7 +26,9 @@ module.exports = {
   },
   get opts() {
     return opts;
-  }
+  },
+
+  ALL: 'all',
 };
 
 const dirs = fs.readdirSync(pwd)

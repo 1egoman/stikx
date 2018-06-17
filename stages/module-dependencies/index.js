@@ -23,6 +23,31 @@ module.exports = async function(modules, opts, [mod]) {
         (parent && parent.type === 'CallExpression') &&
         parent.arguments.length === 1
       ) {
+        // Ensure that the variable that's being used hasn't been overwritten
+        // For examole, we want o detect the first 'foo', but not the second.
+        // function(foo) {
+        //   foo(1)              <- Want this one
+        //   return function() {
+        //     let foo = () => 0
+        //     foo()             <- Don't want this one, the `foo` reference isn't from the module
+        //   }
+        // }
+
+        // const requireReference = currentScope.references
+        //   .find(i => i.identifier.name === mod.parameters.require.name);
+        //
+        // const wasDefinedInModuleWrappingFn = requireReference && (
+        //   // Compare starting and ending characters of both blocks to test equality
+        //   requireReference.from.block.start === mod.ast.node.start &&
+        //   requireReference.from.block.end === mod.ast.node.end
+        // );
+        //
+        // if (wasDefinedInModuleWrappingFn) {
+        //   const modId = parent.arguments[0].value;
+        //   dependants.push(modId);
+        //   nodes.push(parent);
+        // }
+
         const modId = parent.arguments[0].value;
         dependants.push(modId);
         nodes.push(parent);
