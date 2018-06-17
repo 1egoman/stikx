@@ -1,9 +1,13 @@
-const { traverse } = require('../common');
+const { getModules, traverse } = require('../common');
 const debug = require('debug')('styx:rewrite-module-requires');
 
-module.exports = async function rewriteModuleRequires(modules, opts, [mapping]) {
-  const all = modules.map(async mod => {
+module.exports = async function rewriteModuleRequires(modules, opts, [selector, mapping]) {
+  const all = getModules(modules, selector).map(async mod => {
     let dependants, nodes;
+
+    if (!mod.parameters) {
+      return
+    }
 
     // First, get all dependencies of module.
     try {
@@ -21,6 +25,7 @@ module.exports = async function rewriteModuleRequires(modules, opts, [mapping]) 
         nodes[index].arguments[0].value = mapping[dependencyId];
       } else {
         debug(`Warning: require(${dependencyId}) in module ${mod.id} was not replaced, no mapping was specified.`);
+        nodes[index].arguments[0].value = `./${nodes[index].arguments[0].value}`;
       }
     });
   });

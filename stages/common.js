@@ -5,10 +5,8 @@ const noop = () => false;
 
 exports.traverse = function traverse(node, fn, path=[], parent=null, parentKey=null) {
   let enterFn = fn, leaveFn = noop;
-  if (fn.enter) {
-    enterFn = fn.enter;
-    leaveFn = fn.leave;
-  }
+  if (fn.enter) { enterFn = fn.enter; }
+  if (fn.leave) { leaveFn = fn.leave; }
 
   const potentialModuleArrays = [],
         enterResult = enterFn(node, parent, parentKey);
