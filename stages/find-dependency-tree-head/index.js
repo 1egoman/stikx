@@ -33,6 +33,11 @@ module.exports = async function(modules, opts, [mod]) {
     opts.headModule = moduleHeadPossibilities[0];
     return {success: true, value: moduleHeadPossibilities[0]};
   } else {
-    return {success: false, choices: moduleHeadPossibilities};
+    opts.headModuleChoices = moduleHeadPossibilities.sort((a, b) => {
+      // Sort from smallest module to largest. Webpack tends to make a smaller entrypoint that
+      // requires in the real entrypoint.
+      return JSON.stringify(a.ast.body).length - JSON.stringify(b.ast.body).length;
+    });
+    return { success: false, choices: opts.headModuleChoices };
   }
 }

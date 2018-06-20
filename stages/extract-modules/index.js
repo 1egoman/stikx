@@ -25,7 +25,7 @@ function processParameters(element) {
     // require is called, the others aren't. So if a value is called, then it's more
     // likely to be require.
     traverse(element.body, node => {
-      if (node.type !== 'CallExpression') {
+      if (!node || node.type !== 'CallExpression') {
         return;
       }
 
@@ -40,6 +40,7 @@ function processParameters(element) {
     // `module`.
     traverse(element.body, node => {
       if (!(
+        node &&
         node.type == 'MemberExpression' &&
         node.property.type === 'Identifier' &&
         node.property.name === 'exports'

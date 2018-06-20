@@ -1,3 +1,5 @@
+const debug = require('debug')('styx:rename-module-parameters');
+
 const estraverse = require('estraverse');
 const { getModules, traverse } = require('../common');
 
@@ -17,7 +19,8 @@ module.exports = async function(modules, opts, [selector, params]) {
     // to `require`, `module`, and `exports`.
     traverse(mod.ast.body, {
       enter(node, parent, parentKey) {
-        if (node.type === 'Identifier' && parameterNames.includes(node.name)) {
+        if (node && node.type === 'Identifier' && parameterNames.includes(node.name)) {
+          debug(`Found a variable that is defined in the module function!`);
 
           // Find the variable by the name of the identifier in the current scope.
           const variable = currentScope.variables.find(i => i.name === node.name);
@@ -28,12 +31,15 @@ module.exports = async function(modules, opts, [selector, params]) {
             let newName = null;
             switch (variable.name) {
             case mod.parameters.module.name:
+              debug(`Found variable is a module instance`);
               newName = 'module';
               break;
             case mod.parameters.exports.name:
+              debug(`Found variable is an exports instance`);
               newName = 'exports';
               break;
             case mod.parameters.require.name:
+              debug(`Found variable is a require instance`);
               newName = 'require';
               break;
             default: break;

@@ -12,10 +12,12 @@ module.exports = async function(modules, opts, [selector, {map}]) {
           //   .find(i => i.identifier.name === mod.parameters.require.name);
 
           currentScope.variables.forEach(variable => {
-            const newName = map(variable.name);
-            variable.references.forEach(reference => {
-              reference.identifier.name = newName;
-            });
+            if (variable.scope.block !== mod.ast.node) {
+              const newName = map(variable.name);
+              variable.references.forEach(reference => {
+                reference.identifier.name = newName;
+              });
+            }
           })
         }
 
